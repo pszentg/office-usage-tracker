@@ -56,6 +56,12 @@ def main(input_path, filter_type, filter_value):
     if not input_path:
         input_path = os.path.join(Config.RESOURCES_PATH, "datapao_homework_2024.csv")
 
+    if not os.path.exists(input_path):
+        if os.path.exists(os.path.join(Config.RESOURCES_PATH, input_path)):
+            input_path = os.path.join(Config.RESOURCES_PATH, input_path)
+        else:
+            raise FileNotFoundError("Invalid input file path!")
+
     parsed_input = InputParser.parse_input(input_path)
 
     time_manager = TimeManager(parsed_input)
@@ -92,7 +98,7 @@ if __name__ == "__main__":
         "--type",
         required=True,
         choices=["year", "month", "week", "day"],
-        help="Filter type. allowed values: year, month, week, day.",
+        help="Filter type. allowed values: year, month, week, day. Week and day gets the report for the current week/day, month for the specified month, year for the specified year.",
     )
     parser.add_argument(
         "-v",
@@ -117,19 +123,13 @@ if __name__ == "__main__":
                 "the --value argument must be an integer when --type is 'year'"
             )
 
-    if filter_type in ["week, day"]:
-        main(input_file, filter_type, None)
+    try:
+        # omit the value if you want to get the weekly or the daily reports
+        if filter_type in ["week, day"]:
+            main(input_file, filter_type, None)
 
-    else:
-        main(input_file, filter_type, filter_value)
-
-    # try:
-    #     # omit the value if you want to get the weekly or the daily reports
-    #     if filter_type in ["week, day"]:
-    #         main(input_file, filter_type, None)
-
-    #     else:
-    #         main(input_file, filter_type, filter_value)
-    # except Exception as e:
-    #     logger.error("There was an error parsing the instructions.")
-    #     logger.error(f"{e}")
+        else:
+            main(input_file, filter_type, filter_value)
+    except Exception as e:
+        logger.error("There was an error parsing the instructions.")
+        logger.error(f"{e}")

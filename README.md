@@ -40,7 +40,17 @@ The project was written using Python v3.12. Dependencies not included in core Py
 
 Add the project to your PYTHONPATH. Assuming you're in the root of this repository: `export PYTHONPATH=$(pwd)/src:$PYTHONPATH`.
 
-Start the project from the project root with `python main.py -i <your_input_file>`. If you use the included input, use the following: `python main.py -i resources/datapao_homeword_2023.csv`.
+Start the project from the project root with `python main.py -i <your_input_file> -t filter_type -v filter_value`. If you use the included input, use the following: `python main.py -i resources/datapao_homeword_2023.csv -t month -v February`.
+
+## (optional)
+
+You can also get the usage statistics for a specific year (assuming you have more in your input file): `python main.py -i resources/datapao_homeword_2023.csv -t year -v 2023`. You can use the report for 2023-24 in the `resources/`.
+
+Get the reports for the current calendar week: `python main.py -i <your_csv_file_for_the_current_year>, -t week`.
+Get the reports for the current day: `python main.py -i <your_csv_file_for_the_current_year>, -t day`.
+Values supported with the last 2 options are omitted.
+
+Getting the statistics for a specific year or the current calendar week/day was not part of the task explicitly, but it made sense to implement those too.
 
 ## Optional setup
 
