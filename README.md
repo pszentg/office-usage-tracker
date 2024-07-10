@@ -46,6 +46,11 @@ Start the project from the project root with `python main.py -i <your_input_file
 
 Take a look at the config.py class. It offers a class that you can edit to access some config variables in a static way. In case the usage of external packages were allowed, I'd rather use `.env` files, this was the next best thing using core Python.
 
+## Run the tests
+
+Same idea, as running the project, set the PYTHONPATH: `export PYTHONPATH=$(pwd)/src:$PYTHONPATH`.
+Then from the project root: `python -m unittest discover tests`
+
 ## Further improvements
 
 - introducing .env management
