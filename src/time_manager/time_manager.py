@@ -27,7 +27,7 @@ class TimeManager:
                 str.upper(row["event_type"]), event_date
             )
 
-    def calculate_statistics(self, start_time: string, end_time: string) -> dict:
+    def calculate_statistics(self, start_time: datetime, end_time: datetime) -> dict:
         statistics = {}
         for user in self.users.values():
             statistics[user.id] = user.get_attendance_statistics(start_time, end_time)
