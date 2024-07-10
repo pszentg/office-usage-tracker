@@ -54,11 +54,13 @@ class User:
         total_hours = total_time / 3600
 
         # truncate it at 3 decimals so it's more readable
-        average_per_day = "%.3f" % (total_hours / len(days_in_office))
+        average_per_day = (
+            "%.3f" % (total_hours / len(days_in_office)) if days_in_office else 0
+        )
 
         return {
-            "total_hours": total_hours,
-            "days_in_office": len(days_in_office),
+            "time": total_hours,
+            "days": len(days_in_office),
             "average_per_day": average_per_day,
         }
 

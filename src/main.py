@@ -53,7 +53,7 @@ def main(input_path, filter_type, filter_value):
     start_time, end_time = determine_filter_window(filter_type, filter_value)
 
     if not input_path:
-        input_path = os.path.join(Config.RESOURCES_ROOT, "datapao_homework_2023.csv")
+        input_path = os.path.join(Config.RESOURCES_PATH, "datapao_homework_2024.csv")
 
     parsed_input = InputParser.parse_input(input_path)
 
@@ -68,15 +68,17 @@ def main(input_path, filter_type, filter_value):
     # )
 
     # save the results of task 1 into a .csv
-    # OutputManager.write_to_csv(
-    #     office_hours_statistics,
-    #     ["user_id", "time", "days", "average_per_day", "rank"],
-    #     Config.TASK_1_OUTPUT,
-    # )
+    OutputManager.write_to_csv(
+        office_hours_statistics,
+        ["user_id", "time", "days", "average_per_day", "rank"],
+        os.path.join(Config.OUTPUT_PATH, "first.csv"),
+    )
 
-    # # save the results of task 2 into a .csv
+    # save the results of task 2 into a .csv
     # OutputManager.write_to_csv(
-    #     longest_work_session, ["user_id", "session_length"], Config.TASK_2_OUTPUT
+    #     longest_work_session,
+    #     ["user_id", "session_length"],
+    #     os.path.join(Config.OUTPUT_PATH, "second.csv"),
     # )
 
 

@@ -38,6 +38,8 @@ The project was written using Python v3.12. Dependencies not included in core Py
 
 ## Run the project
 
+Add the project to your PYTHONPATH. Assuming you're in the root of this repository: `export PYTHONPATH=$(pwd)/src:$PYTHONPATH`.
+
 Start the project from the project root with `python main.py -i <your_input_file>`. If you use the included input, use the following: `python main.py -i resources/datapao_homeword_2023.csv`.
 
 ## Optional setup

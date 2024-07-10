@@ -31,4 +31,15 @@ class TimeManager:
         for user in self.users.values():
             statistics[user.id] = user.get_attendance_statistics(start_time, end_time)
 
-        return statistics
+        # make it a list and sort it, saving the rank is trivial now
+        sorted_statistics = sorted(
+            statistics.items(), key=lambda x: x[1]["average_per_day"], reverse=True
+        )
+
+        # arrange them in the expected format of the output
+        sorted_statistics_dict = [
+            {"user_id": user_id, "rank": index + 1, **stats}
+            for index, (user_id, stats) in enumerate(sorted_statistics)
+        ]
+
+        return sorted_statistics_dict
