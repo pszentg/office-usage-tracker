@@ -1,8 +1,6 @@
-from datetime import datetime
 import re
 import string
-
-from config import Config
+from datetime import timedelta
 
 
 class User:
@@ -32,7 +30,7 @@ class User:
         # TODO: it would be nice to store them in a sorted order, but that brings in further validation issues.
         self.attendance_data.append((event, timestamp))
 
-    def get_attendance_statistics(self, start_time: str, end_time: str):
+    def get_attendance_statistics(self, start_time: str, end_time: str) -> dict:
 
         # a set can't have duplicate data - ideal to count the amount of individual days
         days_in_office = set()
@@ -64,5 +62,21 @@ class User:
             "average_per_day": average_per_day,
         }
 
-    def get_longest_work_session(self, start_time: string, end_time: string):
-        pass
+    def get_longest_work_session(self, start_time: str, end_time: str) -> timedelta:
+
+        longest_session = timedelta(0)
+        current_in_time = None
+
+        for event, timestamp in self.attendance_data:
+            if not (start_time <= timestamp <= end_time):
+                continue
+
+            if event == "GATE_IN":
+                current_in_time = timestamp
+            elif event == "GATE_OUT" and current_in_time:
+                session_duration = timestamp - current_in_time
+                if session_duration > longest_session:
+                    longest_session = session_duration
+                current_in_time = None
+
+        return longest_session

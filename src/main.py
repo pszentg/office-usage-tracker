@@ -6,7 +6,7 @@ import os
 from config import Config
 from datapao_io.input_parser import InputParser
 from datapao_io.output_manager import OutputManager
-from time_manager import TimeManager
+from time_manager.time_manager import TimeManager
 
 # Could be read from a .env config
 logging.basicConfig(level=Config.LOG_LEVEL)
@@ -26,6 +26,7 @@ def determine_filter_window(filter_type, filter_value):
     if filter_type == "year":
         start_time = datetime(filter_value, 1, 1)
         end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
+    # TODO: parse month even if it's not passed in its with its long name
     elif filter_type == "month":
         start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
         if start_time.month == 12:
@@ -61,11 +62,7 @@ def main(input_path, filter_type, filter_value):
 
     office_hours_statistics = time_manager.calculate_statistics(start_time, end_time)
 
-    logger.info(office_hours_statistics)
-
-    # longest_work_session = time_manager.get_longest_work_session(
-    #     filter_type, filter_value
-    # )
+    longest_work_session = time_manager.get_longest_work_session(start_time, end_time)
 
     # save the results of task 1 into a .csv
     OutputManager.write_to_csv(
@@ -75,11 +72,11 @@ def main(input_path, filter_type, filter_value):
     )
 
     # save the results of task 2 into a .csv
-    # OutputManager.write_to_csv(
-    #     longest_work_session,
-    #     ["user_id", "session_length"],
-    #     os.path.join(Config.OUTPUT_PATH, "second.csv"),
-    # )
+    OutputManager.write_to_csv(
+        longest_work_session,
+        ["user_id", "session_length"],
+        os.path.join(Config.OUTPUT_PATH, "second.csv"),
+    )
 
 
 if __name__ == "__main__":
@@ -100,7 +97,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-v",
         "--value",
-        help="Filter on this value grouped by the type.",
+        help="Filter on this value grouped by the type. In case you're filtering for months, use the full name of the month.",
     )
 
     args = parser.parse_args()
@@ -120,13 +117,19 @@ if __name__ == "__main__":
                 "the --value argument must be an integer when --type is 'year'"
             )
 
-    try:
-        # omit the value if you want to get the weekly or the daily reports
-        if filter_type in ["week, day"]:
-            main(input_file, filter_type, None)
+    if filter_type in ["week, day"]:
+        main(input_file, filter_type, None)
 
-        else:
-            main(input_file, filter_type, filter_value)
-    except Exception as e:
-        logger.error("There was an error parsing the instructions.")
-        logger.error(f"{e}")
+    else:
+        main(input_file, filter_type, filter_value)
+
+    # try:
+    #     # omit the value if you want to get the weekly or the daily reports
+    #     if filter_type in ["week, day"]:
+    #         main(input_file, filter_type, None)
+
+    #     else:
+    #         main(input_file, filter_type, filter_value)
+    # except Exception as e:
+    #     logger.error("There was an error parsing the instructions.")
+    #     logger.error(f"{e}")

@@ -45,3 +45,8 @@ Start the project from the project root with `python main.py -i <your_input_file
 ## Optional setup
 
 Take a look at the config.py class. It offers a class that you can edit to access some config variables in a static way. In case the usage of external packages were allowed, I'd rather use `.env` files, this was the next best thing using core Python.
+
+## Further improvements
+
+- introducing .env management
+- introducing pre-commit hooks to run black and make the code PEP-compliant
