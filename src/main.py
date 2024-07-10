@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime, timedelta
+from enum import Enum
 import logging
 import os
 
@@ -13,21 +14,21 @@ logging.basicConfig(level=Config.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 
-""" 
-Following SOLID, it's a good idea to create an interface for the input parsing.
-This way we can replace it with a different input type later if we want to 
-allow something other, than a .csv input.
-"""
+class FilterType(Enum):
+    YEAR = "year"
+    MONTH = "month"
+    WEEK = "week"
+    DAY = "day"
 
 
 def determine_filter_window(filter_type, filter_value):
     now = datetime.now()
 
-    if filter_type == "year":
+    if filter_type == FilterType.YEAR:
         start_time = datetime(filter_value, 1, 1)
         end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
     # TODO: parse month even if it's not passed in its with its long name
-    elif filter_type == "month":
+    elif filter_type == FilterType.MONTH:
         start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
         if start_time.month == 12:
             end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
@@ -35,14 +36,14 @@ def determine_filter_window(filter_type, filter_value):
             end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
                 seconds=1
             )
-    elif filter_type == "week":
+    elif filter_type == FilterType.WEEK:
         # Start the delta from the Monday of the current week
         start_time = now - datetime.timedelta(days=now.weekday())
         start_time = datetime(start_time.year, start_time.month, start_time.day)
         end_time = start_time + datetime.timedelta(
             days=6, hours=23, minutes=59, seconds=59
         )
-    elif filter_type == "day":
+    elif filter_type == FilterType.MONTH:
         start_time = datetime(now.year, now.month, now.day)
         end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
 
@@ -62,13 +63,19 @@ def main(input_path, filter_type, filter_value):
         else:
             raise FileNotFoundError("Invalid input file path!")
 
+    """ 
+    Following SOLID, it's a good idea to create an interface for the input parsing.
+    This way we can replace it with a different input type later if we want to 
+    allow something other, than a .csv input.
+    """
+    logger.info("Parsing input file..")
     parsed_input = InputParser.parse_input(input_path)
 
+    logger.info('Creating Time manager..')
     time_manager = TimeManager(parsed_input)
 
+    logger.info('Calculating office hours statistics..')
     office_hours_statistics = time_manager.calculate_statistics(start_time, end_time)
-
-    longest_work_session = time_manager.get_longest_work_session(start_time, end_time)
 
     # save the results of task 1 into a .csv
     OutputManager.write_to_csv(
@@ -76,6 +83,12 @@ def main(input_path, filter_type, filter_value):
         ["user_id", "time", "days", "average_per_day", "rank"],
         os.path.join(Config.OUTPUT_PATH, "first.csv"),
     )
+    logger.info(f'Office hour statistics are now available at: {Config.OUTPUT_PATH + 'first.csv'} !')
+
+
+    logger.info('Calculating the longest work session..')
+    longest_work_session = time_manager.get_longest_work_session(start_time, end_time)
+
 
     # save the results of task 2 into a .csv
     OutputManager.write_to_csv(
@@ -83,6 +96,9 @@ def main(input_path, filter_type, filter_value):
         ["user_id", "session_length"],
         os.path.join(Config.OUTPUT_PATH, "second.csv"),
     )
+
+    logger.info(f'Longest work session is available at: {Config.OUTPUT_PATH + 'second.csv'} !')
+
 
 
 if __name__ == "__main__":
@@ -97,7 +113,7 @@ if __name__ == "__main__":
         "-t",
         "--type",
         required=True,
-        choices=["year", "month", "week", "day"],
+        choices=["year", FilterType.MONTH, FilterType.WEEK, FilterType.MONTH],
         help="Filter type. allowed values: year, month, week, day. Week and day gets the report for the current week/day, month for the specified month, year for the specified year.",
     )
     parser.add_argument(
@@ -108,14 +124,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     input_file = args.input_file
-    filter_type = args.type
+    filter_type = FilterType(args.type)
     filter_value = args.value
 
     # validate the arguments
-    if filter_type in ["year", "month"] and filter_value is None:
+    if filter_type in [FilterType.YEAR, FilterType.MONTH] and filter_value is None:
         parser.error(f"the --value argument is required when --type is {filter_type}")
 
-    if filter_type == "year":
+    if filter_type == FilterType.YEAR:
         try:
             filter_value = int(filter_value)
         except ValueError:
@@ -125,7 +141,7 @@ if __name__ == "__main__":
 
     try:
         # omit the value if you want to get the weekly or the daily reports
-        if filter_type in ["week, day"]:
+        if filter_type in [FilterType.WEEK, FilterType.DAY]:
             main(input_file, filter_type, None)
 
         else:
