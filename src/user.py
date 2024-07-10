@@ -1,5 +1,8 @@
+from datetime import datetime
 import re
 import string
+
+from config import Config
 
 
 class User:
@@ -26,10 +29,38 @@ class User:
         elif event == "GATE_OUT" and last_event_type != "GATE_IN":
             raise ValueError("GATE_OUT must be preceded by GATE_IN")
 
+        # TODO: it would be nice to store them in a sorted order, but that brings in further validation issues.
         self.attendance_data.append((event, timestamp))
 
-    def get_attendance_statistics(self, filter_type: string, filter_value: string):
-        pass
+    def get_attendance_statistics(self, start_time: str, end_time: str):
 
-    def get_longest_work_session(self, filter_type: string, filter_value: string):
+        # a set can't have duplicate data - ideal to count the amount of individual days
+        days_in_office = set()
+
+        total_time = 0
+        current_in_time = None
+
+        for event, timestamp in self.attendance_data:
+            if not (start_time <= timestamp <= end_time):
+                continue
+
+            if event == "GATE_IN":
+                current_in_time = timestamp
+                days_in_office.add(timestamp.date())
+            elif event == "GATE_OUT" and current_in_time:
+                total_time += (timestamp - current_in_time).total_seconds()
+                current_in_time = None
+
+        total_hours = total_time / 3600
+
+        # truncate it at 3 decimals so it's more readable
+        average_per_day = "%.3f" % (total_hours / len(days_in_office))
+
+        return {
+            "total_hours": total_hours,
+            "days_in_office": len(days_in_office),
+            "average_per_day": average_per_day,
+        }
+
+    def get_longest_work_session(self, start_time: string, end_time: string):
         pass

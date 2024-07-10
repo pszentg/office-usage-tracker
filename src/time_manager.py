@@ -26,5 +26,9 @@ class TimeManager:
                 str.upper(row["event_type"]), event_date
             )
 
-    def calculate_statistics(self, filter_type: string, filter_value: string):
-        pass
+    def calculate_statistics(self, start_time: string, end_time: string):
+        statistics = {}
+        for user in self.users.values():
+            statistics[user.id] = user.get_attendance_statistics(start_time, end_time)
+
+        return statistics

@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime, timedelta
 import logging
 import os
 
@@ -19,7 +20,38 @@ allow something other, than a .csv input.
 """
 
 
+def determine_filter_window(filter_type, filter_value):
+    now = datetime.now()
+
+    if filter_type == "year":
+        start_time = datetime(filter_value, 1, 1)
+        end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
+    elif filter_type == "month":
+        start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
+        if start_time.month == 12:
+            end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
+        else:
+            end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
+                seconds=1
+            )
+    elif filter_type == "week":
+        # Start the delta from the Monday of the current week
+        start_time = now - datetime.timedelta(days=now.weekday())
+        start_time = datetime(start_time.year, start_time.month, start_time.day)
+        end_time = start_time + datetime.timedelta(
+            days=6, hours=23, minutes=59, seconds=59
+        )
+    elif filter_type == "day":
+        start_time = datetime(now.year, now.month, now.day)
+        end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
+
+    return (start_time, end_time)
+
+
 def main(input_path, filter_type, filter_value):
+
+    start_time, end_time = determine_filter_window(filter_type, filter_value)
+
     if not input_path:
         input_path = os.path.join(Config.RESOURCES_ROOT, "datapao_homework_2023.csv")
 
@@ -27,15 +59,15 @@ def main(input_path, filter_type, filter_value):
 
     time_manager = TimeManager(parsed_input)
 
-    office_hours_statistics = time_manager.calculate_statistics(
-        filter_type, filter_value
-    )
+    office_hours_statistics = time_manager.calculate_statistics(start_time, end_time)
+
+    logger.info(office_hours_statistics)
 
     # longest_work_session = time_manager.get_longest_work_session(
     #     filter_type, filter_value
     # )
 
-    # # save the results of task 1 into a .csv
+    # save the results of task 1 into a .csv
     # OutputManager.write_to_csv(
     #     office_hours_statistics,
     #     ["user_id", "time", "days", "average_per_day", "rank"],
