@@ -38,14 +38,14 @@ def determine_filter_window(filter_type, filter_value):
             )
     elif filter_type == FilterType.WEEK:
         # Start the delta from the Monday of the current week
-        start_time = now - datetime.timedelta(days=now.weekday())
+        start_time = now - timedelta(days=now.weekday())
         start_time = datetime(start_time.year, start_time.month, start_time.day)
-        end_time = start_time + datetime.timedelta(
+        end_time = start_time + timedelta(
             days=6, hours=23, minutes=59, seconds=59
         )
     elif filter_type == FilterType.MONTH:
         start_time = datetime(now.year, now.month, now.day)
-        end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
+        end_time = start_time + timedelta(hours=23, minutes=59, seconds=59)
 
     return (start_time, end_time)
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         "-t",
         "--type",
         required=True,
-        choices=["year", FilterType.MONTH, FilterType.WEEK, FilterType.MONTH],
+        choices=["year", "month", "week", "day"],
         help="Filter type. allowed values: year, month, week, day. Week and day gets the report for the current week/day, month for the specified month, year for the specified year.",
     )
     parser.add_argument(
