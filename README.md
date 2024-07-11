@@ -48,9 +48,11 @@ You can also get the usage statistics for a specific year (assuming you have mor
 
 Get the reports for the current calendar week: `python main.py -i <your_csv_file_for_the_current_year>, -t week`.
 Get the reports for the current day: `python main.py -i <your_csv_file_for_the_current_year>, -t day`.
+Get the reports for a custom time window: `python main.py -i <your_csv_file_for_the_current_year>, -t custom -c YYYY-MM-DD:YYYY-MM-DD`.
+
 Values supported with the last 2 options are omitted.
 
-Getting the statistics for a specific year or the current calendar week/day was not part of the task explicitly, but it made sense to implement those too.
+Getting the statistics for a custom time window, specific year or the current calendar week/day was not part of the task explicitly, but it made sense to implement those too.
 
 ## Optional setup
 

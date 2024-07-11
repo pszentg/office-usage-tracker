@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 import logging
 import os
+import string
 
 from config import Config
 from datapao_io.input_parser import InputParser
@@ -19,40 +20,68 @@ class FilterType(Enum):
     MONTH = "month"
     WEEK = "week"
     DAY = "day"
+    CUSTOM = "custom"
 
 
-def determine_filter_window(filter_type, filter_value):
-    now = datetime.now()
+def determine_filter_window(filter_type:string = None, filter_value:string = None, custom_window:string = None) -> tuple:
+    start_time = None
+    end_time=None
 
-    if filter_type == FilterType.YEAR:
-        start_time = datetime(filter_value, 1, 1)
-        end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
-    # TODO: parse month even if it's not passed in its with its long name
-    elif filter_type == FilterType.MONTH:
-        start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
-        if start_time.month == 12:
-            end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
-        else:
-            end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
-                seconds=1
+
+    if custom_window is not None:
+        times = custom_window.split(":")
+        if len(times) != 2:
+            raise ValueError("Provided custom time format is invalid!")
+        
+        start_time = datetime.strptime(times[0], "%Y-%m-%d")
+        end_time = datetime.strptime(times[1], "%Y-%m-%d")
+
+    
+    else:
+        now = datetime.now()
+
+        if filter_type == FilterType.YEAR:
+            start_time = datetime(filter_value, 1, 1)
+            end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
+        # TODO: parse month even if it's not passed in its with its long name
+        elif filter_type == FilterType.MONTH:
+            start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
+            if start_time.month == 12:
+                end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
+            else:
+                end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
+                    seconds=1
+                )
+        elif filter_type == FilterType.WEEK:
+            # Start the delta from the Monday of the current week
+            start_time = now - timedelta(days=now.weekday())
+            start_time = datetime(start_time.year, start_time.month, start_time.day)
+            end_time = start_time + timedelta(
+                days=6, hours=23, minutes=59, seconds=59
             )
-    elif filter_type == FilterType.WEEK:
-        # Start the delta from the Monday of the current week
-        start_time = now - timedelta(days=now.weekday())
-        start_time = datetime(start_time.year, start_time.month, start_time.day)
-        end_time = start_time + timedelta(
-            days=6, hours=23, minutes=59, seconds=59
-        )
-    elif filter_type == FilterType.MONTH:
-        start_time = datetime(now.year, now.month, now.day)
-        end_time = start_time + timedelta(hours=23, minutes=59, seconds=59)
+        elif filter_type == FilterType.DAY:
+            start_time = datetime(now.year, now.month, now.day)
+            end_time = start_time + timedelta(hours=23, minutes=59, seconds=59)
+
+    if start_time is None or end_time is None:
+        raise ValueError("Incorrect filter window!")
+    
+    logger.info(f"Filtering attendance records between {start_time} and {end_time}")
 
     return (start_time, end_time)
 
 
-def main(input_path, filter_type, filter_value):
 
-    start_time, end_time = determine_filter_window(filter_type, filter_value)
+def main(input_path:string = None, filter_type:string = None, filter_value:string = None, custom_window:string = None):
+
+    start_time =  None
+    end_time = None
+    
+    if custom_window:
+        start_time, end_time = determine_filter_window(custom_window=custom_window)
+
+    else:
+        start_time, end_time = determine_filter_window(filter_type, filter_value)
 
     if not input_path:
         input_path = os.path.join(Config.RESOURCES_PATH, "datapao_homework_2024.csv")
@@ -113,7 +142,7 @@ if __name__ == "__main__":
         "-t",
         "--type",
         required=True,
-        choices=["year", "month", "week", "day"],
+        choices=["year", "month", "week", "day", "custom"],
         help="Filter type. allowed values: year, month, week, day. Week and day gets the report for the current week/day, month for the specified month, year for the specified year.",
     )
     parser.add_argument(
@@ -122,10 +151,17 @@ if __name__ == "__main__":
         help="Filter on this value grouped by the type. In case you're filtering for months, use the full name of the month.",
     )
 
+    parser.add_argument(
+        "-c", 
+        "--custom_range", 
+        help="This flag allows you to add a custom date range as a filter. The format is: YYYY-MM-DD:YYYY-MM-DD",
+        )
+
     args = parser.parse_args()
     input_file = args.input_file
     filter_type = FilterType(args.type)
     filter_value = args.value
+    custom=args.custom_range
 
     # validate the arguments
     if filter_type in [FilterType.YEAR, FilterType.MONTH] and filter_value is None:
@@ -140,8 +176,10 @@ if __name__ == "__main__":
             )
 
     try:
+        if filter_type == FilterType.CUSTOM:
+            main(custom_window = custom)
         # omit the value if you want to get the weekly or the daily reports
-        if filter_type in [FilterType.WEEK, FilterType.DAY]:
+        elif filter_type in [FilterType.WEEK, FilterType.DAY]:
             main(input_file, filter_type, None)
 
         else:
