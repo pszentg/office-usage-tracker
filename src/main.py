@@ -23,45 +23,43 @@ class FilterType(Enum):
     CUSTOM = "custom"
 
 
-def determine_filter_window(filter_type:string = None, filter_value:string = None, custom_window:string = None) -> tuple:
+def determine_filter_window(filter_type: str = None, filter_value: str = None) -> tuple:
     start_time = None
     end_time=None
 
+    now = datetime.now()
 
-    if custom_window is not None:
-        times = custom_window.split(":")
+    if filter_type == FilterType.YEAR:
+        start_time = datetime(filter_value, 1, 1)
+        end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
+    # TODO: parse month even if it's not passed in its with its long name
+    elif filter_type == FilterType.MONTH:
+        start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
+        if start_time.month == 12:
+            end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
+        else:
+            end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
+                seconds=1
+            )
+    elif filter_type == FilterType.WEEK:
+        # Start the delta from the Monday of the current week
+        start_time = now - timedelta(days=now.weekday())
+        start_time = datetime(start_time.year, start_time.month, start_time.day)
+        end_time = start_time + timedelta(
+            days=6, hours=23, minutes=59, seconds=59
+        )
+    elif filter_type == FilterType.DAY:
+        start_time = datetime(now.year, now.month, now.day)
+        end_time = start_time + timedelta(hours=23, minutes=59, seconds=59)
+
+    elif filter_type == FilterType.CUSTOM:
+        times = filter_value.split(":")
         if len(times) != 2:
             raise ValueError("Provided custom time format is invalid!")
-        
+    
         start_time = datetime.strptime(times[0], "%Y-%m-%d")
         end_time = datetime.strptime(times[1], "%Y-%m-%d")
 
-    
-    else:
-        now = datetime.now()
-
-        if filter_type == FilterType.YEAR:
-            start_time = datetime(filter_value, 1, 1)
-            end_time = datetime(filter_value + 1, 1, 1) - timedelta(seconds=1)
-        # TODO: parse month even if it's not passed in its with its long name
-        elif filter_type == FilterType.MONTH:
-            start_time = datetime(now.year, datetime.strptime(filter_value, "%B").month, 1)
-            if start_time.month == 12:
-                end_time = datetime(now.year + 1, 1, 1) - timedelta(seconds=1)
-            else:
-                end_time = datetime(now.year, start_time.month + 1, 1) - timedelta(
-                    seconds=1
-                )
-        elif filter_type == FilterType.WEEK:
-            # Start the delta from the Monday of the current week
-            start_time = now - timedelta(days=now.weekday())
-            start_time = datetime(start_time.year, start_time.month, start_time.day)
-            end_time = start_time + timedelta(
-                days=6, hours=23, minutes=59, seconds=59
-            )
-        elif filter_type == FilterType.DAY:
-            start_time = datetime(now.year, now.month, now.day)
-            end_time = start_time + timedelta(hours=23, minutes=59, seconds=59)
 
     if start_time is None or end_time is None:
         raise ValueError("Incorrect filter window!")
@@ -72,18 +70,12 @@ def determine_filter_window(filter_type:string = None, filter_value:string = Non
 
 
 
-def main(input_path:string = None, filter_type:string = None, filter_value:string = None, custom_window:string = None):
+def main(input_path:str = None, filter_type:str = None, filter_value:str = None):
 
-    start_time =  None
-    end_time = None
-    
-    if custom_window:
-        start_time, end_time = determine_filter_window(custom_window=custom_window)
-
-    else:
-        start_time, end_time = determine_filter_window(filter_type, filter_value)
+    start_time, end_time = determine_filter_window(filter_type, filter_value)
 
     if not input_path:
+        logger.info("Using default example dataset.")
         input_path = os.path.join(Config.RESOURCES_PATH, "datapao_homework_2024.csv")
 
     if not os.path.exists(input_path):
@@ -112,7 +104,7 @@ def main(input_path:string = None, filter_type:string = None, filter_value:strin
         ["user_id", "time", "days", "average_per_day", "rank"],
         os.path.join(Config.OUTPUT_PATH, "first.csv"),
     )
-    logger.info(f'Office hour statistics are now available at: {Config.OUTPUT_PATH + 'first.csv'} !')
+    logger.info(f'Office hour statistics are now available at: {Config.OUTPUT_PATH + '/first.csv'} !')
 
 
     logger.info('Calculating the longest work session..')
@@ -126,7 +118,7 @@ def main(input_path:string = None, filter_type:string = None, filter_value:strin
         os.path.join(Config.OUTPUT_PATH, "second.csv"),
     )
 
-    logger.info(f'Longest work session is available at: {Config.OUTPUT_PATH + 'second.csv'} !')
+    logger.info(f'Longest work session is available at: {Config.OUTPUT_PATH + '/second.csv'} !')
 
 
 
@@ -143,25 +135,18 @@ if __name__ == "__main__":
         "--type",
         required=True,
         choices=["year", "month", "week", "day", "custom"],
-        help="Filter type. allowed values: year, month, week, day. Week and day gets the report for the current week/day, month for the specified month, year for the specified year.",
+        help="Filter type. allowed values: year, month, week, day, custom. Week and day gets the report for the current week/day, month for the specified month, year for the specified year. Custom gets results in the specified range.",
     )
     parser.add_argument(
         "-v",
         "--value",
-        help="Filter on this value grouped by the type. In case you're filtering for months, use the full name of the month.",
+        help="Filter on this value grouped by the type. In case you're filtering for months, use the full name of the month. If you want to specify a custom range, the format is: YYYY-MM-DD:YYYY-MM-DD",
     )
-
-    parser.add_argument(
-        "-c", 
-        "--custom_range", 
-        help="This flag allows you to add a custom date range as a filter. The format is: YYYY-MM-DD:YYYY-MM-DD",
-        )
 
     args = parser.parse_args()
     input_file = args.input_file
     filter_type = FilterType(args.type)
     filter_value = args.value
-    custom=args.custom_range
 
     # validate the arguments
     if filter_type in [FilterType.YEAR, FilterType.MONTH] and filter_value is None:
@@ -176,10 +161,7 @@ if __name__ == "__main__":
             )
 
     try:
-        if filter_type == FilterType.CUSTOM:
-            main(custom_window = custom)
-        # omit the value if you want to get the weekly or the daily reports
-        elif filter_type in [FilterType.WEEK, FilterType.DAY]:
+        if filter_type in [FilterType.WEEK, FilterType.DAY]:
             main(input_file, filter_type, None)
 
         else:
