@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class OutputManager:
     @staticmethod
-    def write_to_csv(data, headers, output_location):
+    def write_to_csv(data, headers, output_location) -> None:
         if not os.path.exists(os.path.dirname(output_location)):
             os.makedirs(os.path.dirname(output_location))
 

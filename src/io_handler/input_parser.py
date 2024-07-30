@@ -1,7 +1,6 @@
 import csv
 import os
 import string
-from typing import List
 
 
 class InvalidCSVError(Exception):
@@ -17,7 +16,7 @@ class InputParser:
     REQUIRED_HEADERS = {"user_id", "event_type", "event_time"}
 
     @staticmethod
-    def parse_input(input_path: string) -> List:
+    def parse_input(input_path: string) -> list:
         if not os.path.exists(input_path):
             raise OSError("File does not exist!")
 
@@ -28,7 +27,7 @@ class InputParser:
             return InputParser.parse_txt_input(input_path)
 
     @staticmethod
-    def parse_csv_input(input_path: string) -> List:
+    def parse_csv_input(input_path: string) -> list:
 
         with open(input_path, mode="r", newline="") as file:
             reader = csv.DictReader(file)
@@ -47,7 +46,7 @@ class InputParser:
         return data
 
     @staticmethod
-    def parse_txt_input(input_path: string) -> List:
+    def parse_txt_input(input_path: string) -> list:
         with open(input_path, mode="r", newline="") as file:
             data = [line.strip().split(",") for line in file]
 

@@ -6,7 +6,7 @@ from user.user import User
 
 
 class TimeManager:
-    def __init__(self, parsed_input: list):
+    def __init__(self, parsed_input: list) -> None:
         self.users = {}
         # create the users
         for row in parsed_input:
@@ -25,7 +25,7 @@ class TimeManager:
             event_date = datetime.strptime(row["event_time"], Config.TIMESTAMP_FORMAT)
             self.users[user_id].add_to_attendance(row["event_type"], event_date)
 
-    def calculate_statistics(self, start_time: datetime, end_time: datetime) -> dict:
+    def calculate_statistics(self, start_time: datetime, end_time: datetime) -> list:
         statistics = {}
         for user in self.users.values():
             statistics[user.id] = user.get_attendance_statistics(start_time, end_time)
@@ -36,12 +36,12 @@ class TimeManager:
         )
 
         # arrange them in the expected format of the output
-        sorted_statistics_dict = [
+        sorted_statistics_list = [
             {"user_id": user_id, "rank": index + 1, **stats}
             for index, (user_id, stats) in enumerate(sorted_statistics)
         ]
 
-        return sorted_statistics_dict
+        return sorted_statistics_list
 
     def format_longest_work_session(self, session: timedelta) -> string:
         s = session.seconds
