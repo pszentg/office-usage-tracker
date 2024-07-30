@@ -1,7 +1,7 @@
 import unittest
 import os
 import csv
-from src.datapao_io.output_manager import OutputManager
+from src.io_handler.output_manager import OutputManager
 
 
 class TestOutputManager(unittest.TestCase):
