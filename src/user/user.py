@@ -4,7 +4,7 @@ from datetime import timedelta
 
 
 class User:
-    def __init__(self, id):
+    def __init__(self, id) -> None:
         # The pattern in the example is similar to a GUID, but not specifically GUID.
         guid_pattern = r"[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}"
 

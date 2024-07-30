@@ -41,11 +41,25 @@ class InputParser:
 
             data = [row for row in reader]
 
+            for row in data:
+                row["event_type"] = row["event_type"].upper()
+
         return data
 
     @staticmethod
     def parse_txt_input(input_path: string) -> List:
         with open(input_path, mode="r", newline="") as file:
-            data = [row for row in file]
+            data = [line.strip().split(",") for line in file]
 
-        return data
+        # Ensure we have the correct number of columns and headers match
+        headers = ["user_id", "event_type", "event_time"]
+        parsed_data = []
+        for row in data:
+            if len(row) == len(headers):
+                row_dict = {headers[i]: row[i] for i in range(len(headers))}
+                row_dict["event_type"] = row_dict["event_type"].upper()
+                parsed_data.append(row_dict)
+            else:
+                raise ValueError(f"Each row must have {len(headers)} columns")
+
+        return parsed_data

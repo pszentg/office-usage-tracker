@@ -1,5 +1,5 @@
 import unittest
-from src.datapao_io.input_parser import InputParser
+from src.io_handler.input_parser import InputParser
 
 
 class TestInputParser(unittest.TestCase):

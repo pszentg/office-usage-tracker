@@ -23,9 +23,7 @@ class TimeManager:
             # get the TIMESTAMP_FORMAT from the config. The example defined ISO-8601.
             # This will throw an error for other formats.
             event_date = datetime.strptime(row["event_time"], Config.TIMESTAMP_FORMAT)
-            self.users[user_id].add_to_attendance(
-                str.upper(row["event_type"]), event_date
-            )
+            self.users[user_id].add_to_attendance(row["event_type"], event_date)
 
     def calculate_statistics(self, start_time: datetime, end_time: datetime) -> dict:
         statistics = {}

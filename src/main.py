@@ -3,11 +3,10 @@ from datetime import datetime, timedelta
 from enum import Enum
 import logging
 import os
-import string
 
 from config import Config
-from datapao_io.input_parser import InputParser
-from datapao_io.output_manager import OutputManager
+from io_handler.input_parser import InputParser
+from io_handler.output_manager import OutputManager
 from time_manager.time_manager import TimeManager
 
 # Could be read from a .env config
@@ -70,7 +69,7 @@ def determine_filter_window(filter_type: str = None, filter_value: str = None) -
 
 
 
-def main(input_path:str = None, filter_type:str = None, filter_value:str = None):
+def main(input_path:str = None, filter_type:str = None, filter_value:str = None) -> None:
 
     start_time, end_time = determine_filter_window(filter_type, filter_value)
 
