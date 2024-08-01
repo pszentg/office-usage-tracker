@@ -4,14 +4,22 @@ from enum import Enum
 import logging
 import os
 
-from config import Config
 from io_handler.input_parser import InputParser
 from io_handler.output_manager import OutputManager
 from time_manager.time_manager import TimeManager
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Could be read from a .env config
-logging.basicConfig(level=Config.LOG_LEVEL)
+logging.basicConfig(level=os.getenv("LOG_LEVEL"))
 logger = logging.getLogger(__name__)
+
+# this is the project root. Python files are in the SRC folder
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+
+RESOURCES_PATH = os.path.join(ROOT_DIR, os.getenv("RESOURCES_PATH"))
+OUTPUT_PATH = os.path.join(ROOT_DIR, os.getenv("OUTPUT_PATH"))
 
 
 class FilterType(Enum):
@@ -75,11 +83,11 @@ def main(input_path:str = None, filter_type:str = None, filter_value:str = None)
 
     if not input_path:
         logger.info("Using default example dataset.")
-        input_path = os.path.join(Config.RESOURCES_PATH, "datapao_homework_2024.csv")
+        input_path = os.path.join(os.path.os.getenv("RESOURCES_PATH"), "datapao_homework_2024.csv")
 
     if not os.path.exists(input_path):
-        if os.path.exists(os.path.join(Config.RESOURCES_PATH, input_path)):
-            input_path = os.path.join(Config.RESOURCES_PATH, input_path)
+        if os.path.exists(os.path.join(RESOURCES_PATH, input_path)):
+            input_path = os.path.join(RESOURCES_PATH, input_path)
         else:
             raise FileNotFoundError("Invalid input file path!")
 
@@ -101,9 +109,9 @@ def main(input_path:str = None, filter_type:str = None, filter_value:str = None)
     OutputManager.write_to_csv(
         office_hours_statistics,
         ["user_id", "time", "days", "average_per_day", "rank"],
-        os.path.join(Config.OUTPUT_PATH, "first.csv"),
+        os.path.join(OUTPUT_PATH, "office_statistics.csv"),
     )
-    logger.info(f'Office hour statistics are now available at: {Config.OUTPUT_PATH + '/first.csv'} !')
+    logger.info(f'Office hour statistics are now available at: {OUTPUT_PATH + '/office_statistics.csv'} !')
 
 
     logger.info('Calculating the longest work session..')
@@ -114,10 +122,10 @@ def main(input_path:str = None, filter_type:str = None, filter_value:str = None)
     OutputManager.write_to_csv(
         longest_work_session,
         ["user_id", "session_length"],
-        os.path.join(Config.OUTPUT_PATH, "second.csv"),
+        os.path.join(OUTPUT_PATH, "second.csv"),
     )
 
-    logger.info(f'Longest work session is available at: {Config.OUTPUT_PATH + '/second.csv'} !')
+    logger.info(f'Longest work session is available at: {OUTPUT_PATH + '/second.csv'} !')
 
 
 
@@ -167,4 +175,4 @@ if __name__ == "__main__":
             main(input_file, filter_type, filter_value)
     except Exception as e:
         logger.error("There was an error parsing the instructions.")
-        logger.error(f"{e}")
+        raise e

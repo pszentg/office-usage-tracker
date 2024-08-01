@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+import os
 import string
 
-from config import Config
 from user.user import User
+
+TIMESTAMP_FORMAT = os.getenv("TIMESTAMP_FORMAT")
 
 
 class TimeManager:
@@ -22,7 +24,7 @@ class TimeManager:
             user_id = row["user_id"]
             # get the TIMESTAMP_FORMAT from the config. The example defined ISO-8601.
             # This will throw an error for other formats.
-            event_date = datetime.strptime(row["event_time"], Config.TIMESTAMP_FORMAT)
+            event_date = datetime.strptime(row["event_time"], TIMESTAMP_FORMAT)
             self.users[user_id].add_to_attendance(row["event_type"], event_date)
 
     def calculate_statistics(self, start_time: datetime, end_time: datetime) -> list:

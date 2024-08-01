@@ -1,6 +1,6 @@
-# datapao-assignment
+# Office time tracker
 
-A repository for the assignment for the interview with DATAPAO
+This is a project that simulates an office tracking people entering and leaving the premises and offering some insights of your office usage.
 
 ## The task description
 
@@ -22,41 +22,38 @@ In the file in `resources/` you can find data of IoT devices related to 25 peopl
      - eg. IN 8, OUT 12, IN 15, OUT 18, (IN next day) → these count as two sessions from 8 to 12 and from 15 to 18
 
 3. (optional) You have the data. Please show us your ideas. It’s an opportunity to propose an insight you think would be valuable.
-
-## Task Requirements
-
-Only core python libraries are allowed, the data can not be stored in SQLite. Jupyter notebooks are also disallowed.
+   - handle different input types, eg. `.txt`
+   - implement a filter for different time ranges, eg. yearly, weekly, and daily.
+   - implement a filter for custom date ranges.
 
 ### Output requirements
 
-- /output/first.csv | Header: (user_id, time, days, average_per_day, rank)
-- /output/second.csv | Header: (user_id, session_length)
+- `/output/office_statistics.csv` | Header: (user_id, time, days, average_per_day, rank)
+- `/output/longest_work_session.csv` | Header: (user_id, session_length)
 
 ## Project dependencies
 
-The project was written using Python v3.12. Dependencies not included in core Python are not allowed, therefore no `pip install -r requirements.txt` or installing any packages is needed.
+After activating your virtual environment, run `pip install -r requirements.txt`
 
 ## Run the project
 
 Add the project to your PYTHONPATH. Assuming you're in the root of this repository: `export PYTHONPATH=$(pwd)/src:$PYTHONPATH`.
 
-Start the project from the project root with `python main.py -i <your_input_file> -t filter_type -v filter_value`. If you use the included input, use the following: `python main.py -i resources/datapao_homeword_2023.csv -t month -v February`.
+Start the project from the project root with `python main.py -i <your_input_file> -t filter_type -v filter_value`. If you use the included input, use the following: `python main.py -i resources/input_2023-24.csv -t month -v February`.
 
 ## (optional)
 
-You can also get the usage statistics for a specific year (assuming you have more in your input file): `python main.py -i resources/datapao_homeword_2023.csv -t year -v 2023`. You can use the report for 2023-24 in the `resources/`.
+You can also get the usage statistics for a specific year (assuming you have more in your input file): `python main.py -i resources/input_2023-24.csv -t year -v 2023`. You can use the report for 2023-24 in the `resources/`.
 
 Get the reports for the current calendar week: `python main.py -i <your_csv_file_for_the_current_year>, -t week`.
 Get the reports for the current day: `python main.py -i <your_csv_file_for_the_current_year>, -t day`.
 Get the reports for a custom time window: `python main.py -i <your_csv_file_for_the_current_year>, -t custom -v YYYY-MM-DD:YYYY-MM-DD`.
 
+Note that the time format for the custom filter can be altered using the `.env` file.
+
 Values supported with the last 2 options are omitted.
 
 Getting the statistics for a custom time window, specific year or the current calendar week/day was not part of the task explicitly, but it made sense to implement those too.
-
-## Optional setup
-
-Take a look at the config.py class. It offers a class that you can edit to access some config variables in a static way. In case the usage of external packages were allowed, I'd rather use `.env` files, this was the next best thing using core Python.
 
 ## Run the tests
 
@@ -65,5 +62,4 @@ Then from the project root: `python -m unittest discover tests`
 
 ## Further improvements
 
-- introducing .env management
 - introducing pre-commit hooks to run black and make the code PEP-compliant

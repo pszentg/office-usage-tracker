@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import unittest
 from src.user.user import User
-from src.config import Config
 
 
 class TestUser(unittest.TestCase):

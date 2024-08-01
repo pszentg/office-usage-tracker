@@ -1,32 +1,37 @@
 import unittest
 import os
-from config import Config
 from main import main, FilterType
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OUTPUT_PATH = os.getenv("OUTPUT_PATH")
 
 
 class TestMainIntegration(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
-        Config.OUTPUT_PATH = os.path.join(
+        OUTPUT_PATH = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "output/tests"
         )
         # Set up paths and configurations
         self.resources_path = "resources"
         self.input_file = os.path.join(self.resources_path, "tests/test_input.csv")
 
-        if not os.path.exists(Config.OUTPUT_PATH):
-            os.makedirs(Config.OUTPUT_PATH)
+        if not os.path.exists(OUTPUT_PATH):
+            os.makedirs(OUTPUT_PATH)
 
         # Ensure the input file exists for testing
         if not os.path.exists(self.input_file):
             raise FileNotFoundError("Input file for tests not found!")
 
     def test_main_year_filter(self):
-        Config.OUTPUT_PATH = os.path.join(Config.OUTPUT_PATH, "year")
+        OUTPUT_PATH = os.path.join(OUTPUT_PATH, "year")
         main(input_path=self.input_file, filter_type=FilterType.YEAR, filter_value=2024)
-        first_output_path = os.path.join(Config.OUTPUT_PATH, "first.csv")
-        second_output_path = os.path.join(Config.OUTPUT_PATH, "second.csv")
+        first_output_path = os.path.join(OUTPUT_PATH, "office_statistics.csv")
+        second_output_path = os.path.join(OUTPUT_PATH, "second.csv")
 
         # Check if output files are created
         self.assertTrue(
@@ -47,14 +52,14 @@ class TestMainIntegration(unittest.TestCase):
 
     def test_main_custom_filter(self):
 
-        Config.OUTPUT_PATH = os.path.join(Config.OUTPUT_PATH, "custom")
+        OUTPUT_PATH = os.path.join(OUTPUT_PATH, "custom")
         main(
             input_path=self.input_file,
             filter_type=FilterType.CUSTOM,
             filter_value="2024-01-01:2024-06-30",
         )
-        first_output_path = os.path.join(Config.OUTPUT_PATH, "first.csv")
-        second_output_path = os.path.join(Config.OUTPUT_PATH, "second.csv")
+        first_output_path = os.path.join(OUTPUT_PATH, "office_statistics.csv")
+        second_output_path = os.path.join(OUTPUT_PATH, "second.csv")
 
         self.assertTrue(
             os.path.exists(first_output_path), "First output file not created!"
@@ -83,14 +88,14 @@ class TestMainIntegration(unittest.TestCase):
             self.assertEqual(second_content.strip(), expected_second_output.strip())
 
     def test_main_month_filter(self):
-        Config.OUTPUT_PATH = os.path.join(Config.OUTPUT_PATH, "month")
+        OUTPUT_PATH = os.path.join(OUTPUT_PATH, "month")
         main(
             input_path=self.input_file,
             filter_type=FilterType.MONTH,
             filter_value="July",
         )
-        first_output_path = os.path.join(Config.OUTPUT_PATH, "first.csv")
-        second_output_path = os.path.join(Config.OUTPUT_PATH, "second.csv")
+        first_output_path = os.path.join(OUTPUT_PATH, "office_statistics.csv")
+        second_output_path = os.path.join(OUTPUT_PATH, "second.csv")
 
         # Check if output files are created
         self.assertTrue(
@@ -110,10 +115,10 @@ class TestMainIntegration(unittest.TestCase):
             self.assertIn("user_id", second_content)
 
     def test_main_week_filter(self):
-        Config.OUTPUT_PATH = os.path.join(Config.OUTPUT_PATH, "week")
+        OUTPUT_PATH = os.path.join(OUTPUT_PATH, "week")
         main(input_path=self.input_file, filter_type=FilterType.WEEK, filter_value=None)
-        first_output_path = os.path.join(Config.OUTPUT_PATH, "first.csv")
-        second_output_path = os.path.join(Config.OUTPUT_PATH, "second.csv")
+        first_output_path = os.path.join(OUTPUT_PATH, "office_statistics.csv")
+        second_output_path = os.path.join(OUTPUT_PATH, "second.csv")
 
         # Check if output files are created
         self.assertTrue(
@@ -133,10 +138,10 @@ class TestMainIntegration(unittest.TestCase):
             self.assertIn("user_id", second_content)
 
     def test_main_day_filter(self):
-        Config.OUTPUT_PATH = os.path.join(Config.OUTPUT_PATH, "day")
+        OUTPUT_PATH = os.path.join(OUTPUT_PATH, "day")
         main(input_path=self.input_file, filter_type=FilterType.DAY, filter_value=None)
-        first_output_path = os.path.join(Config.OUTPUT_PATH, "first.csv")
-        second_output_path = os.path.join(Config.OUTPUT_PATH, "second.csv")
+        first_output_path = os.path.join(OUTPUT_PATH, "office_statistics.csv")
+        second_output_path = os.path.join(OUTPUT_PATH, "second.csv")
 
         # Check if output files are created
         self.assertTrue(

@@ -59,7 +59,7 @@ class User:
         return {
             "time": total_hours,
             "days": len(days_in_office),
-            "average_per_day": average_per_day,
+            "average_per_day": float(average_per_day),
         }
 
     def get_longest_work_session(self, start_time: str, end_time: str) -> timedelta:

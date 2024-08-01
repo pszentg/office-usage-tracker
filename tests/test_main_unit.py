@@ -11,7 +11,6 @@ class TestMainUnit(unittest.TestCase):
     @patch("main.InputParser")
     @patch("main.TimeManager")
     @patch("main.OutputManager")
-    @patch("main.Config")
     def test_main_year_filter(
         self,
         mock_config,
@@ -21,8 +20,6 @@ class TestMainUnit(unittest.TestCase):
         mock_datetime,
     ):
         mock_datetime.now.return_value = datetime(2024, 7, 13)
-        mock_config.RESOURCES_PATH = "resources"
-        mock_config.OUTPUT_PATH = "output"
         mock_config.LOG_LEVEL = logging.DEBUG
 
         mock_input_parser.parse_input.return_value = MagicMock()
@@ -43,7 +40,7 @@ class TestMainUnit(unittest.TestCase):
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "time": 8, "days": 5, "average_per_day": 1.6, "rank": 1}],
             ["user_id", "time", "days", "average_per_day", "rank"],
-            "output/first.csv",
+            "output/office_statistics.csv",
         )
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "session_length": 5}],
@@ -55,7 +52,6 @@ class TestMainUnit(unittest.TestCase):
     @patch("main.InputParser")
     @patch("main.TimeManager")
     @patch("main.OutputManager")
-    @patch("main.Config")
     def test_main_custom_filter(
         self,
         mock_config,
@@ -65,8 +61,6 @@ class TestMainUnit(unittest.TestCase):
         mock_datetime,
     ):
         mock_datetime.now.return_value = datetime(2024, 7, 13)
-        mock_config.RESOURCES_PATH = "resources"
-        mock_config.OUTPUT_PATH = "output"
         mock_config.LOG_LEVEL = logging.DEBUG
 
         mock_input_parser.parse_input.return_value = MagicMock()
@@ -87,7 +81,7 @@ class TestMainUnit(unittest.TestCase):
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "time": 8, "days": 5, "average_per_day": 1.6, "rank": 1}],
             ["user_id", "time", "days", "average_per_day", "rank"],
-            "output/first.csv",
+            "output/office_statistics.csv",
         )
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "session_length": 5}],
@@ -99,7 +93,6 @@ class TestMainUnit(unittest.TestCase):
     @patch("main.InputParser")
     @patch("main.TimeManager")
     @patch("main.OutputManager")
-    @patch("main.Config")
     def test_main_month_filter(
         self,
         mock_config,
@@ -109,8 +102,6 @@ class TestMainUnit(unittest.TestCase):
         mock_datetime,
     ):
         mock_datetime.now.return_value = datetime(2024, 7, 13)
-        mock_config.RESOURCES_PATH = "resources"
-        mock_config.OUTPUT_PATH = "output"
         mock_config.LOG_LEVEL = logging.DEBUG
 
         mock_input_parser.parse_input.return_value = MagicMock()
@@ -131,7 +122,7 @@ class TestMainUnit(unittest.TestCase):
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "time": 8, "days": 5, "average_per_day": 1.6, "rank": 1}],
             ["user_id", "time", "days", "average_per_day", "rank"],
-            "output/first.csv",
+            "output/office_statistics.csv",
         )
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "session_length": 5}],
@@ -143,7 +134,6 @@ class TestMainUnit(unittest.TestCase):
     @patch("main.InputParser")
     @patch("main.TimeManager")
     @patch("main.OutputManager")
-    @patch("main.Config")
     def test_main_week_filter(
         self,
         mock_config,
@@ -153,8 +143,6 @@ class TestMainUnit(unittest.TestCase):
         mock_datetime,
     ):
         mock_datetime.now.return_value = datetime(2024, 7, 13)
-        mock_config.RESOURCES_PATH = "resources"
-        mock_config.OUTPUT_PATH = "output"
         mock_config.LOG_LEVEL = logging.DEBUG
 
         mock_input_parser.parse_input.return_value = MagicMock()
@@ -175,7 +163,7 @@ class TestMainUnit(unittest.TestCase):
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "time": 8, "days": 5, "average_per_day": 1.6, "rank": 1}],
             ["user_id", "time", "days", "average_per_day", "rank"],
-            "output/first.csv",
+            "output/office_statistics.csv",
         )
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "session_length": 5}],
@@ -187,7 +175,6 @@ class TestMainUnit(unittest.TestCase):
     @patch("main.InputParser")
     @patch("main.TimeManager")
     @patch("main.OutputManager")
-    @patch("main.Config")
     def test_main_day_filter(
         self,
         mock_config,
@@ -197,8 +184,6 @@ class TestMainUnit(unittest.TestCase):
         mock_datetime,
     ):
         mock_datetime.now.return_value = datetime(2024, 7, 13)
-        mock_config.RESOURCES_PATH = "resources"
-        mock_config.OUTPUT_PATH = "output"
         mock_config.LOG_LEVEL = logging.DEBUG
 
         mock_input_parser.parse_input.return_value = MagicMock()
@@ -219,7 +204,7 @@ class TestMainUnit(unittest.TestCase):
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "time": 8, "days": 5, "average_per_day": 1.6, "rank": 1}],
             ["user_id", "time", "days", "average_per_day", "rank"],
-            "output/first.csv",
+            "output/office_statistics.csv",
         )
         mock_output_manager.write_to_csv.assert_any_call(
             [{"user_id": 1, "session_length": 5}],
